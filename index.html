@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Boxer Game</title>
+</head>
+<body>
+	<h1>Boxer Game</h1>
+	<p>Money: $<span id="money">0</span></p>
+	<p>Strength: <span id="strength">1</span></p>
+	<button id="janitor-button">Work as a Janitor</button>
+	<button id="train-button">Train</button>
+	<button id="fight-button">Fight an Opponent</button>
+	<ul id="businesses">
+	</ul>
+	<ul id="opponents">
+	</ul>
+	<style>
+		.buy-business-button {
+			color: white;
+			background-color: green;
+			border: none;
+			padding: 5px 10px;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+	</style>
+	<script>
+		const janitorButton = document.getElementById('janitor-button');
+		janitorButton.addEventListener('click', () => {
+			const moneySpan = document.getElementById('money');
+			const currentMoney = parseInt(moneySpan.textContent, 10);
+			moneySpan.textContent =currentMoney + 10;
+		});
+
+		let strength = 1;
+		let cost = 100;
+		const trainButton = document.getElementById('train-button');
+		trainButton.addEventListener('click', () => {
+			const moneySpan = document.getElementById('money');
+			const currentMoney = parseInt(moneySpan.textContent, 10);
+			if (currentMoney < cost) {
+				alert('You do not have enough money to train');
+				return;
+			}
+			const strengthSpan = document.getElementById('strength');
+			strengthSpan.textContent = ++strength;
+			moneySpan.textContent = currentMoney - cost;
+			cost *= 1.1;
+			trainButton.innerHTML = 'Train (Cost: $' + cost + ')';
+		});
+
+		const fightButton = document.getElementById('fight-button');
+		fightButton.addEventListener('click', () => {
+			const opponents = document.getElementById('opponents').children;
+			for (let i = 0; i < opponents.length; i++) {
+				const opponent = opponents[i];
+				if (opponent.classList.contains('defeated')) {
+					continue;
+				}
+				const opponentStrength = (2 ** i) + 1;
+				const totalStrength = strength + opponentStrength;
+				const rand = Math.random();
+				if (rand < strength / totalStrength) {
+					opponent.classList.add('defeated');
+					opponent.style.textDecoration = 'line-through';
+					const reward = (2 ** i) * 100;
+					const moneySpan = document.getElementById('money');
+					moneySpan.textContent = parseInt(moneySpan.textContent, 10) + reward;
+					alert('You have defeated Opponent ' + (i + 1) + ' and won $' + reward);
+					break;
+				} else {
+					strength /= 2;
+					cost /= 2;
+					const strengthSpan = document.getElementById('strength');
+					strengthSpan.textContent = strength;
+					trainButton.innerHTML = 'Train (Cost: $' + cost + ')';
+					alert('You have been defeated by Opponent ' + (i + 1));
+					break;
+				}
+			}
+		});
+
+		const businesses = [
+			{ name: 'Lemonade Stand', value: 10, income: 2 },
+			{ name: 'Car Wash', value: 50, income: 10 },
+			{ name: 'Pizza Restaurant', value: 600, income: 20 },
+			{ name: 'Grocery Store', value: 10000, income: 54 },
+			{ name: 'Software Company', value: 100000, income: 162 },
+			{ name: 'Real Estate Agency', value: 1000000, income: 486 },
+			{ name: 'Tech Startup', value: 10000000, income: 1458 },
+			{ name: 'Investment Bank', value: 100000000, income: 4374 },
+			{ name: 'Aerospace Manufacturer', value: 1000000000, income: 13122 },
+			{ name: 'Pharmaceutical Company', value: 10000000000, income: 39366 }
+		];
+		const businessList = document.getElementById('businesses');
+		for (const business of businesses) {
+			const li = document.createElement('li');
+			const button = document.createElement('button');
+			button.classList.add('buy-business-button');
+			button.textContent = 'Buy';
+			button.addEventListener('click', () => {
+				const moneySpan = document.getElementById('money');
+				const currentMoney = parseInt(moneySpan.textContent, 10);
+				if (currentMoney < business.value) {
+					alert('You do not have enough money to buy this business');
+					return;
+				}
+				moneySpan.textContent = currentMoney - business.value;
+				setInterval(() => {
+					moneySpan.textContent= parseInt(moneySpan.textContent, 10) + business.income;
+				}, 5000);
+				button.style.display = 'none';
+				button.nextSibling.textContent = 'Working';
+				button.nextSibling.style.color = 'green';
+			});
+			li.appendChild(button);
+			li.appendChild(document.createTextNode(business.name + ' (Value: $' + business.value + ')'));
+			businessList.appendChild(li);
+		}
+
+		const opponents = [
+			{ name: 'Frank the Tank', strength: 1, reward: 100 },
+			{ name: 'Boris the Blade', strength: 2, reward: 200 },
+			{ name: 'Razorgirl', strength: 4, reward: 400 },
+			{ name: 'The Gorgon', strength: 8, reward: 800 },
+			{ name: 'The Sledgehammer', strength: 16, reward: 1600 },
+			{ name: 'The Buzzsaw', strength: 32, reward: 3200 },
+			{ name: 'The Kamikaze', strength: 64, reward: 6400 },
+			{ name: 'The Kraken', strength: 128, reward: 12800 },
+			{ name: 'The Widowmaker', strength: 256, reward: 25600 },
+			{ name: 'The Juggernaut', strength: 512, reward: 51200 }
+		];
+		const opponentList = document.getElementById('opponents');
+		for (const opponent of opponents) {
+			const li = document.createElement('li');
+			li.appendChild(document.createTextNode(opponent.name + ' (Strength: ' + opponent.strength + ')'));
+			opponentList.appendChild(li);
+		}
+
+		trainButton.innerHTML = 'Train (Cost: $' + cost + ')';
+	</script>
+</body>
+</html>
